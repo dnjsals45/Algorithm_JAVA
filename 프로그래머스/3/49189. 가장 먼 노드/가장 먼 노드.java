@@ -9,7 +9,6 @@ class Solution {
     static boolean[] visited;
     static List<Integer>[] map;
     static int answer = 0;
-    static int node = 0;
     public int solution(int n, int[][] edge) {
         visited = new boolean[n + 1];
         map  = new ArrayList[n + 1];
