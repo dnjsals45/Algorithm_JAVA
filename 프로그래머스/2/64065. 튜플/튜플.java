@@ -2,44 +2,21 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String s) {
-        List<Integer[]> list = new ArrayList<>();
+        String[] arr = s.replace("{", " ").replace("}", " ").trim().split(" , ");
+        Arrays.sort(arr, (a, b) -> {return a.length() - b.length();});
+        List<String> list = new ArrayList<>();
+        int[] answer = new int[arr.length];
         
-        s = s.substring(1, s.length() - 1);
+        int index = 0;
         
-        String[] sets = s.split("\\},\\{");
-        
-        for (String set : sets) {
-            set = set.replace("{", "").replace("}", "");
-            
-            String[] numbers = set.split(",");
-            Integer[] arr = new Integer[numbers.length];
-            
-            for (int i = 0; i < numbers.length; i++) {
-                arr[i] = Integer.parseInt(numbers[i]);
-            }
-            
-            list.add(arr);
-        }
-        
-        Collections.sort(list, new Comparator<Integer[]>() {
-            @Override
-            public int compare(Integer[] o1, Integer[] o2) {
-                return Integer.compare(o1.length, o2.length);
-            }
-        });
-        
-        List<Integer> result = new ArrayList<>();
-        for (Integer[] arr : list) {
-            for (Integer num : arr) {
-                if (!result.contains(num)) {
-                    result.add(num);
+        for (String s1 : arr) {
+            for (String s2 : s1.split(",")) {
+                if (!list.contains(s2)) {
+                    list.add(s2);
+                    answer[index] = Integer.parseInt(s2);
+                    index++;
                 }
             }
-        }
-        
-        int[] answer = new int[result.size()];
-        for (int i = 0; i < answer.length; i++) {
-            answer[i] = result.get(i);
         }
         
         return answer;
