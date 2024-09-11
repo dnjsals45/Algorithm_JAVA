@@ -1,22 +1,10 @@
 import java.util.*;
 import java.io.*;
 
+// 다익스트라 -> 플로이드-와샬 알고리즘으로 변경
 public class Main {
-    static class Node implements Comparable<Node> {
-        int end;
-        int price;
 
-        Node(int end, int price) {
-            this.end = end;
-            this.price = price;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return price - o.price;
-        }
-    }
-
+    static int INF = 1000000000;
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
@@ -27,11 +15,12 @@ public class Main {
         // 버스의 개수 m
         int m = Integer.parseInt(br.readLine());
 
-        List<Node>[] list = new ArrayList[n + 1];
-        int[][] dist = new int[n + 1][n + 1];
+        int[][] arr = new int[n + 1][n + 1];
 
         for (int i = 1; i <= n; i++) {
-            list[i] = new ArrayList<>();
+            for (int j = 1; j <= n; j++) {
+                arr[i][j] = i == j ? 0 : INF;
+            }
         }
 
         for (int i = 1; i <= m; i++) {
@@ -41,45 +30,26 @@ public class Main {
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
 
-            list[a].add(new Node(b, c));
+            if (arr[a][b] > c) {
+                arr[a][b] = c;
+            }
         }
 
-        for (int i = 1; i <= n; i++) {
-            Arrays.fill(dist[i], Integer.MAX_VALUE);
-            dist[i][i] = 0;  // 자기 자신으로의 비용은 0
-            dijkstra(i, list, dist[i]);
+        for (int k = 1; k <= n; k++) {
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= n; j++) {
+                    if (arr[i][k] + arr[k][j] < arr[i][j]) {
+                        arr[i][j] = arr[i][k] + arr[k][j];
+                    }
+                }
+            }
         }
 
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
-                System.out.print(dist[i][j] == Integer.MAX_VALUE ? 0 + " " : dist[i][j] + " ");
+                System.out.print(arr[i][j] == INF ? 0 + " " : arr[i][j] + " ");
             }
             System.out.println();
-        }
-    }
-
-    static void dijkstra(int start, List<Node>[] list, int[] dist) {
-        PriorityQueue<Node> pq = new PriorityQueue<>();
-        pq.offer(new Node(start, 0));
-
-        while (!pq.isEmpty()) {
-            Node current = pq.poll();
-            int end = current.end;
-            int price = current.price;
-
-            if (dist[end] < price) {
-                continue;
-            }
-
-            for (Node node : list[end]) {
-                int next = node.end;
-                int nextPrice = price + node.price;
-
-                if (nextPrice < dist[next]) {
-                    dist[next] = nextPrice;
-                    pq.offer(new Node(next, nextPrice));
-                }
-            }
         }
     }
 }
