@@ -1,50 +1,40 @@
-// 17 -> 1, 7
-// 1, 7, 17, 71
 import java.util.*;
 
 class Solution {
+    static Set<Integer> numberSet = new HashSet<>();
+    static boolean[] visited;
+    
     public int solution(String numbers) {
+        visited = new boolean[numbers.length()];    
+        generateNumbers("", numbers);
+        
         int answer = 0;
-        StringBuilder sb = new StringBuilder();
-        Set<Integer> number = new HashSet<>();
-        char[] numberArray = numbers.toCharArray();
-        boolean[] visited = new boolean[numberArray.length];
-        
-        generateNumber(numberArray, visited, sb, number);
-        
-        for (int num : number) {
+        for (int num : numberSet) {
             if (isPrime(num)) {
                 answer++;
             }
         }
-        
         return answer;
     }
     
-    public void generateNumber(char[] numberArray, boolean[] visited, StringBuilder current, Set<Integer> number) {
-       if (current.length() > 0) {
-           number.add(Integer.parseInt(current.toString()));
-       }
+    public void generateNumbers(String cur, String numbers) {
+        if (!cur.isEmpty()) {
+            numberSet.add(Integer.parseInt(cur));
+        }
         
-        for (int i = 0; i < numberArray.length; i++) {
+        for (int i = 0; i < numbers.length(); i++) {
             if (!visited[i]) {
                 visited[i] = true;
-                current.append(numberArray[i]);
-                generateNumber(numberArray, visited, current, number);
-                current.deleteCharAt(current.length() - 1);
+                generateNumbers(cur + numbers.charAt(i), numbers);
                 visited[i] = false;
             }
         }
     }
     
-    public boolean isPrime(int number) {
-        if (number < 2) {
-            return false;
-        }
-        for (int i = 2; i <= Math.sqrt(number); i++) {
-            if (number % i == 0) {
-                return false;
-            }
+    private boolean isPrime(int num) {
+        if (num < 2) return false;
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) return false;
         }
         return true;
     }
