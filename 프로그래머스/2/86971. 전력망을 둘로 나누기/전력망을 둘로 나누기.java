@@ -1,45 +1,49 @@
 import java.util.*;
 
 class Solution {
-    static int[][] map;
     public int solution(int n, int[][] wires) {
         int answer = Integer.MAX_VALUE;
-        map = new int[n + 1][n + 1];
+        List<Integer>[] graph = new ArrayList[n + 1];
         
-        for (int i = 0; i < wires.length; i++) {
-            map[wires[i][0]][wires[i][1]] = 1;
-            map[wires[i][1]][wires[i][0]] = 1;
+        for (int i = 1; i <= n; i++) {
+            graph[i] = new ArrayList<>();
         }
         
-        for (int i = 0; i < wires.length; i++) {
-            int a = wires[i][0];
-            int b = wires[i][1];
-            
-            map[a][b] = 0;
-            map[b][a] = 0;
-            
-            answer = Math.min(answer, bfs(a, n));
-            
-            map[a][b] = 1;
-            map[b][a] = 1;
+        for (int[] wire : wires) {
+            graph[wire[0]].add(wire[1]);
+            graph[wire[1]].add(wire[0]);
         }
-               
+        
+        for (int[] wire : wires) {
+            int a = wire[0];
+            int b = wire[1];
+            
+            graph[a].remove(Integer.valueOf(b));
+            graph[b].remove(Integer.valueOf(a));
+            
+            answer = Math.min(answer, bfs(graph, n, a));
+            
+            graph[a].add(b);
+            graph[b].add(a);
+        }
+        
         return answer;
     }
     
-    public int bfs(int a, int n) {
-        int cnt = 1;
+    private int bfs (List<Integer>[] graph, int n, int start) {
         boolean[] visited = new boolean[n + 1];
-        Queue<Integer> queue = new LinkedList<>();
+        Queue<Integer> q = new LinkedList<>();
         
-        queue.add(a);
+        q.add(start);
+        visited[start] = true;
+        int cnt = 1;
         
-        while (!queue.isEmpty()) {
-            int tmp = queue.poll();
-            visited[tmp] = true;
-            for (int i = 1; i < n + 1; i++){
-                if (map[tmp][i] == 1 && !visited[i]) {
-                    queue.add(i);
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            for (int next : graph[cur]) {
+                if (!visited[next]) {
+                    visited[next] = true;
+                    q.add(next);
                     cnt++;
                 }
             }
