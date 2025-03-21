@@ -1,31 +1,37 @@
 import java.util.*;
 
 class Solution {
-    static ArrayList<String> path = new ArrayList<>();
-    static boolean[] visited;
+    List<String> answer;
     public String[] solution(String[][] tickets) {
-        visited = new boolean[tickets.length];
+        boolean[] visited = new boolean[tickets.length];
+        List<String> result = new ArrayList<>();
+        result.add("ICN");
         
-        dfs(tickets, "ICN", "ICN", 0);
+        Arrays.sort(tickets, (a, b) -> a[1].compareTo(b[1]));
         
-        Collections.sort(path);
+        dfs("ICN", tickets, result, visited, 0);
         
-        return path.get(0).split(" ");
+        return answer.toArray(new String[0]);
     }
     
-    static void dfs(String[][] tickets, String now, String next, int depth) {
+    private void dfs(String start, String[][] tickets, List<String> result, boolean[] visited, int depth) {
         if (depth == tickets.length) {
-            path.add(next);
+            if (answer == null) {
+                answer = new ArrayList<>(result);
+            }
             return;
         }
         
         for (int i = 0; i < tickets.length; i++) {
-            if (!visited[i] && now.equals(tickets[i][0])) {
+            if (!visited[i] && tickets[i][0].equals(start)) {
                 visited[i] = true;
-                dfs(tickets, tickets[i][1], next + " " + tickets[i][1], depth + 1);
+                result.add(tickets[i][1]);
+                
+                dfs(tickets[i][1], tickets, result, visited, depth + 1);
+                
                 visited[i] = false;
+                result.remove(result.size() - 1);
             }
         }
     }
-    
 }
