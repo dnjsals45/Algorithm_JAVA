@@ -1,56 +1,58 @@
+import java.util.*;
+
 class Solution {
-    static int answer = 0;
-    static boolean possible = false;
-    static boolean[] visited;
     public int solution(String begin, String target, String[] words) {
-        // 최종 변환이 불가능하다면 애초에 로직을 돌리지 않고 바로 return시킴
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].equals(target)) {
+        boolean possible = false;
+        
+        for (String word : words) {
+            if (word.equals(target)) {
                 possible = true;
+                break;
             }
         }
-        if (possible == false) {
-            return 0;
+        
+        if (!possible) return 0;
+        
+        boolean[] visited = new boolean[words.length];
+        
+        Queue<Word> q = new LinkedList<>();
+        q.add(new Word(begin, 0));
+        
+        while (!q.isEmpty()) {
+            Word cur = q.poll();
+            
+            if (cur.word.equals(target)) return cur.depth;
+            
+            for (int i = 0; i < words.length; i++) {
+                if (!visited[i] && canConvert(cur.word, words[i])) {
+                    visited[i] = true;
+                    q.add(new Word(words[i], cur.depth + 1));
+                }
+            }
         }
         
-        visited = new boolean[words.length];
-        find(begin, target, words);
+        int answer = 0;
         return answer;
     }
     
-    static void find(String current, String target, String[] words) {
-        // 단어 다른 개수가 몇개인가?(diff)
+    private boolean canConvert(String word, String target) {
         int diff = 0;
         
-        // 현재 current index의 visited를 true로 변경
-        for (int i = 0; i < words.length; i++) {
-            if (current.equals(words[i])) {
-                visited[i] = true;
-            }
+        for (int i = 0; i < word.length(); i++) {
+            if (word.charAt(i) != target.charAt(i)) diff++;
         }
         
-        // current와 target의 단어 차이 개수가 1개밖에 나지 않는다면 바로 변환 가능
-        for (int i = 0; i < current.length(); i++) {
-            if (current.charAt(i) != target.charAt(i))
-                diff++;
-        }
-        if (diff == 1) {
-            answer++;
-            return;
+        return diff == 1;
+    }
+    
+    public class Word {
+        String word;
+        int depth;
+        
+        public Word(String w, int d) {
+            this.word = w;
+            this.depth = d;
         }
         
-        // 그게 아니라면 중간 변환 과정이 필요함
-        for (int i = 0; i < words.length; i++) {
-            diff = 0;
-            for (int j = 0; j < current.length(); j++) {
-                if (current.charAt(j) != words[i].charAt(j))
-                    diff++;
-            }
-            if (diff == 1 && !visited[i]) {
-                find(words[i], target, words);
-                answer++;
-                return;
-            }
-        }
     }
 }
