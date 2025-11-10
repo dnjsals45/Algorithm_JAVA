@@ -1,36 +1,63 @@
 import java.util.*;
 
-// 크루스칼 알고리즘을 이용한 문제
-// 부모 노드를 이용하여 합침이 되었는가를 판별할 수 있음(이런 건 어떻게 생각하는걸까)
-// 부모 노드는 일반적으로 더 작은 수로 설정함 
 class Solution {
-    public int solution(int n, int[][] costs) {
-        int answer = 0;
-        int[] node = new int[n];
-        for (int i = 0; i < n; i++) {
-            node[i] = i; // 자기 자신을 부모 노드로 먼저 설정
-        }
-        //costs를 비용 오름차순으로 정렬
-        Arrays.sort(costs, (o1, o2) -> o1[2] - o2[2]);
+    class Node implements Comparable<Node> {
+        int start;
+        int end;
+        int cost;
         
-        // find-union 과정
-        for (int i = 0; i < costs.length; i++) {
-            int p1 = find(node, costs[i][0]);
-            int p2 = find(node, costs[i][1]);
-            if(p1 != p2) {
-                node[p2] = p1;
-                answer += costs[i][2];
+        public Node(int start, int end, int cost) {
+            this.start = start;
+            this.end = end;
+            this.cost = cost;
+        }
+        
+        @Override
+        public int compareTo(Node o) {
+            return this.cost - o.cost;
+        }
+    }
+    
+    static int[] parent;
+    public int solution(int n, int[][] costs) {
+        List<Node> list = new ArrayList<>();
+        
+        for (int[] cost : costs) {
+            list.add(new Node(cost[0], cost[1], cost[2]));
+        }
+        
+        Collections.sort(list);
+        
+        parent = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+        
+        int answer = 0;
+        int count = 0;
+        
+        for (Node edge : list) {
+            if (find(edge.start) != find(edge.end)) {
+                union(edge.start, edge.end);
+                answer += edge.cost;
+                count++;
             }
+            
+            if (count == n - 1) break;
         }
         
         return answer;
     }
     
-    // 가장 최상위 부모 노드를 찾아야 함
-    public int find(int[] parent, int node) {
-        if (parent[node] == node) {
-            return node;
-        }
-        return find(parent, parent[node]);
+    public int find(int x) {
+        if (parent[x] == x) return x;
+        parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    
+    public void union(int x, int y) {
+        x = find(x);
+        y= find(y);
+        if (x != y) parent[y] = x;
     }
 }
