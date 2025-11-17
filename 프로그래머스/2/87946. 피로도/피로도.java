@@ -1,25 +1,22 @@
 class Solution {
-    // dfs에 인자로 보내지 않고 그냥 쓸 수 있도록 밖에 선언
-    public int answer; 
-    public boolean[] visited;
-    
+    static boolean[] visited;
+    static int answer = 0;
     public int solution(int k, int[][] dungeons) {
         visited = new boolean[dungeons.length];
-        
-        dfs(0, k, dungeons);
-    
+        dfs(k, dungeons, 0);
         return answer;
     }
     
-    public void dfs(int depth, int k, int[][] dungeons) {
+    private void dfs(int k, int[][] dungeons, int cnt) {
+        answer = Math.max(answer, cnt);
+        
         for (int i = 0; i < dungeons.length; i++) {
-            if (!visited[i] && dungeons[i][0] <= k) {
+            int[] dungeon = dungeons[i];
+            if (!visited[i] && k - dungeon[0] >= 0) {
                 visited[i] = true;
-                dfs(depth + 1, k - dungeons[i][1], dungeons);
+                dfs(k - dungeon[1], dungeons, cnt + 1);
                 visited[i] = false;
             }
         }
-        
-        answer = Math.max(answer, depth);
     }
 }
