@@ -2,33 +2,30 @@ import java.util.*;
 
 class Solution {
     public String[] solution(String[] record) {
-        List<String> list = new ArrayList<>();
-        List<String> answer = new ArrayList<>();
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> msg = new HashMap<>();
+        Map<String, String> nickname = new HashMap<>();
         
-        for (String str : record) {
-            String[] log = str.replace("\"", " ").trim().split(" ");
-
-            String command = log[0];
-            String uid = log[1];
-            if (command.equals("Enter")) {
-                String nickname = log[2];
-                map.put(uid, nickname);
-                list.add(uid + "님이 들어왔습니다.");
-            } else if (command.equals("Leave")) {
-                list.add(uid + "님이 나갔습니다.");
-            } else if (command.equals("Change")) {
-                String nickname = log[2];
-                map.put(uid, nickname);
+        msg.put("Enter", "님이 들어왔습니다.");
+        msg.put("Leave", "님이 나갔습니다.");
+        
+        for (String s : record) {
+            String[] str = s.split(" ");
+            
+            if (str.length == 3) {
+                nickname.put(str[1], str[2]);
             }
         }
         
-        for (String line : list) {
-            String uid = line.replace("\"", " ").trim().split(" ")[0].replace("님이", "");
-            String nickname = map.get(uid);
-            answer.add(line.replace(uid, nickname));
+        List<String> answer = new ArrayList<>();
+        
+        for (String s : record) {
+            String[] str = s.split(" ");
+            
+            if (msg.containsKey(str[0])) {
+                answer.add(nickname.get(str[1]) + msg.get(str[0]));
+            }
         }
         
-        return answer.stream().toArray(String[]::new);
+        return answer.toArray(new String[0]);
     }
 }
