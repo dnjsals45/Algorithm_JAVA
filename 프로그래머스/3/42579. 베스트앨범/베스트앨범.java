@@ -1,43 +1,37 @@
-// 속한노래 재생순 -> 장르 재생순 -> 고유번호순
 import java.util.*;
+import java.util.stream.*;
 
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
-        List<Integer> answer = new ArrayList<>();
-        Map<String, Integer> contain = new HashMap<>();
-        Map<String, Map<Integer, Integer>> genreMap = new HashMap<>();
+        Map<String, List<int[]>> genreMap = new HashMap<>();
+        Map<String, Integer> playMap = new HashMap<>();
         
         for (int i = 0; i < genres.length; i++) {
-            contain.put(genres[i], contain.getOrDefault(genres[i], 0) + plays[i]);
+            String genre = genres[i];
+            int playCount = plays[i];
+            
+            if (!genreMap.containsKey(genre)) {
+                genreMap.put(genre, new ArrayList<>());
+                playMap.put(genre, 0);
+            }
+            
+            genreMap.get(genre).add(new int[]{i, playCount});
+            playMap.put(genre, playMap.get(genre) + playCount);
+        }
+        
+        List<Integer> answer = new ArrayList<>();
+        
+        Stream<Map.Entry<String, Integer>> sortedGenre = playMap.entrySet()
+            .stream()
+            .sorted((o1, o2) -> Integer.compare(o2.getValue(), o1.getValue()));
+        
+        sortedGenre.forEach(entry -> {
+            Stream<int[]> sortedSongs = genreMap.get(entry.getKey()).stream()
+                .sorted((o1, o2) -> Integer.compare(o2[1], o1[1]))
+                .limit(2);
+            sortedSongs.forEach(song -> answer.add(song[0]));
+        });        
 
-            if (!genreMap.containsKey(genres[i])) {
-               genreMap.put(genres[i], new HashMap<>());
-            }
-            
-            genreMap.get(genres[i]).put(i, plays[i]);
-        }
-        
-        List<String> containKeySet = new ArrayList<>(contain.keySet());
-        
-        containKeySet.sort((o1, o2) -> contain.get(o2).compareTo(contain.get(o1)));
-        
-        for (String key : containKeySet) {
-            Map<Integer, Integer> data = genreMap.get(key);
-            List<Integer> dataKeySet = new ArrayList<>(data.keySet());
-            
-            dataKeySet.sort((o1, o2) -> {
-                if (!data.get(o1).equals(data.get(o2))) {
-                    return data.get(o2) - data.get(o1);
-                }
-                return o1 - o2;
-            });
-            
-            answer.add(dataKeySet.get(0));
-            if (dataKeySet.size() >= 2) {
-                answer.add(dataKeySet.get(1));
-            }
-        }
-        
-        return answer.stream().mapToInt(i -> i).toArray();
+        return answer.stream().mapToInt(Integer::intValue).toArray();
     }
 }
