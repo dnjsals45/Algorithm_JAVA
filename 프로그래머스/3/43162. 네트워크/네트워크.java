@@ -1,28 +1,39 @@
 import java.util.*;
 
 class Solution {
+    static int[] parent;
     public int solution(int n, int[][] computers) {
-        int answer = 0;
-        
-        boolean[] visited = new boolean[n];
+        parent = new int[n];
+        for(int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
         
         for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
-                dfs(i, computers, visited);
-                answer++;
+            for (int j = 0; j < n; j++) {
+                if (computers[i][j] == 1) {
+                    union(i, j);
+                }
             }
         }
         
-        return answer;
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            set.add(find(i));
+        }
+        
+        return set.size();
     }
     
-    private void dfs(int cur, int[][] computers, boolean[] visited) {
-        visited[cur] = true;
+    public int find(int x) {
+        if (parent[x] == x) return x;
         
-        for (int i = 0; i < computers.length; i++) {
-            if (i != cur && computers[cur][i] == 1 && !visited[i]) {
-                dfs(i, computers, visited);
-            }
-        }
+        return parent[x] = find(parent[x]);
+    }
+    
+    public void union(int x, int y) {
+        int root1 = find(x);
+        int root2 = find(y);
+        
+        parent[root1] = root2;
     }
 }
