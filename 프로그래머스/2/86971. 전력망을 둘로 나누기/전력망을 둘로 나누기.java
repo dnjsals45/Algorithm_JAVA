@@ -1,54 +1,44 @@
 import java.util.*;
 
 class Solution {
+    static List<Integer>[] list;
+    static boolean[] visited;
+    static int N;
+    static int answer;
+    
     public int solution(int n, int[][] wires) {
-        int answer = Integer.MAX_VALUE;
-        List<Integer>[] graph = new ArrayList[n + 1];
+        N = n;
+        answer = n - 1;
+        list = new ArrayList[n + 1];
         
         for (int i = 1; i <= n; i++) {
-            graph[i] = new ArrayList<>();
+            list[i] = new ArrayList<>();
         }
         
         for (int[] wire : wires) {
-            graph[wire[0]].add(wire[1]);
-            graph[wire[1]].add(wire[0]);
+            list[wire[0]].add(wire[1]);
+            list[wire[1]].add(wire[0]);
         }
         
-        for (int[] wire : wires) {
-            int a = wire[0];
-            int b = wire[1];
-            
-            graph[a].remove(Integer.valueOf(b));
-            graph[b].remove(Integer.valueOf(a));
-            
-            answer = Math.min(answer, bfs(graph, n, a));
-            
-            graph[a].add(b);
-            graph[b].add(a);
-        }
+        visited = new boolean[n + 1];
+        dfs(1);
         
         return answer;
     }
     
-    private int bfs (List<Integer>[] graph, int n, int start) {
-        boolean[] visited = new boolean[n + 1];
-        Queue<Integer> q = new LinkedList<>();
+    public int dfs(int now) {
+        visited[now] = true;
+        int sum = 0;
         
-        q.add(start);
-        visited[start] = true;
-        int cnt = 1;
-        
-        while (!q.isEmpty()) {
-            int cur = q.poll();
-            for (int next : graph[cur]) {
-                if (!visited[next]) {
-                    visited[next] = true;
-                    q.add(next);
-                    cnt++;
-                }
+        for (int next : list[now]) {
+            if (!visited[next]) {
+                int cnt = dfs(next);
+                answer = Math.min(answer, Math.abs(N - cnt * 2));
+                
+                sum += cnt;
             }
         }
         
-        return Math.abs(cnt - (n - cnt));
+        return sum + 1;
     }
 }
