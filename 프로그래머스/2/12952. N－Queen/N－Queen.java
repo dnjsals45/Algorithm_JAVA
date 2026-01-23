@@ -1,31 +1,30 @@
-import java.util.*;
-
 class Solution {
     static int answer;
-    public int solution(int n) {        
+    
+    public int solution(int n) {
         int[] queens = new int[n];
         
-        dfs(0, queens);
+        solve(0, queens);
         
         return answer;
     }
     
-    public void dfs(int row, int[] queens) {
+    public void solve(int row, int[] queens) {
         if (row == queens.length) {
             answer++;
             return;
         }
         
         for (int col = 0; col < queens.length; col++) {
-            if (isOk(row, col, queens)) {
+            if (isValid(row, col, queens)) {
                 queens[row] = col;
-                dfs(row + 1, queens);
-                queens[row] = -1;
+                solve(row + 1, queens);
+                queens[row] = 0;
             }
         }
     }
     
-    public boolean isOk(int row, int col, int[] queens) {
+    public boolean isValid(int row, int col, int[] queens) {
         for (int i = 0; i < row; i++) {
             if (queens[i] == col) {
                 return false;
